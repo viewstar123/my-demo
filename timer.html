@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link href="stylesheets/bootstrap.min.css" rel="stylesheet" />
+    <script src="javascripts/jquery-2.1.0.min.js"></script>
+    <script src="javascripts/bootstrap.min.js"></script>
+    <script language="javascript">
+
+        var settings = {
+            title : "",
+            dst_time : 0,
+        };
+
+        function load_settings() {
+            str_settings = decodeURIComponent(location.search);
+            if (str_settings.length > 1) {
+                str_settings = str_settings.substr(1, str_settings.length - 1);
+                settings = JSON.parse(str_settings);
+            }
+        }
+
+        function update_settings() {
+            str_settings = JSON.stringify(settings);
+            location.search = str_settings
+        }
+
+        function refresh() {
+            $("#title").text(settings.title);
+            var now = new Date();
+            var delta = settings.dst_time - now.getTime();
+            $("#days").text((delta / ( 24 * 60 * 60 * 1000 )).toFixed());
+            $("#hours").text(((delta % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)).toFixed());
+            $("#minutes").text(((delta % (60 * 60 * 1000)) / (60 * 1000)).toFixed());
+            $("#seconds").text(((delta % (60 * 1000)) / (1000)).toFixed());
+            setTimeout(refresh, 1000);
+        }
+
+        $(document).ready(function () {
+            load_settings();
+            refresh();
+            $("#btn-update").click(function () {
+                settings.title      = $("#input-title").val();
+                str_dst_datetime    = $("#input-date").val() + "T" + $("#input-time").val();
+                settings.dst_time   = Date.parse(str_dst_datetime);
+                update_settings();
+                $('#tab-home').tab('show');
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" id="tab-panel">
+        <li class="active"><a href="#home" role="tab" data-toggle="tab" id="tab-home">Home</a></li>
+        <li class="pull-right"><a href="#settings" role="tab" data-toggle="tab" id="tab-settings"><span class="glyphicon glyphicon-cog"></span></a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="home">
+            <div style="text-align:center">
+                <h2>距</h2>
+                <h1 id="title"></h1>
+                <h3>还有</h3>
+                <h1>
+                    <span id="days"></span>天
+                    <span id="hours"></span>小时
+                    <span id="minutes"></span>分种
+                    <span id="seconds"></span>秒
+                </h1>
+            </div>
+        </div>
+        <div class="tab-pane" id="settings">
+            <form role="form" style="margin:10px">
+                <div class="form-group">
+                    <label for="input-title">标题</label>
+                    <input type="text" class="form-control" id="input-title" placeholder="计时器标题">
+                </div>
+                <div class="form-group">
+                    <label for="input-date">日期</label>
+                    <input type="date" class="form-control" id="input-date" placeholder="YYYY-MM-DD">
+                </div>
+                <div class="form-group">
+                    <label for="input-time">时间</label>
+                    <input type="time" class="form-control" id="input-time" placeholder="HH:MM:SS">
+                </div>
+                <button class="btn btn-default" id="btn-update">UPDATE</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
