@@ -14,7 +14,7 @@
         };
 
         function load_settings() {
-            str_settings = decodeURIComponent(location.search);
+            str_settings = decodeURIComponent(location.hash);
             if (str_settings.length > 1) {
                 str_settings = str_settings.substr(1, str_settings.length - 1);
                 settings = JSON.parse(str_settings);
@@ -23,7 +23,7 @@
 
         function update_settings() {
             str_settings = JSON.stringify(settings);
-            location.search = str_settings
+            location.hash = str_settings
         }
 
         function refresh() {
