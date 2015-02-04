@@ -206,15 +206,15 @@ class Image(object):
 
 简单总结下，面向组件的编程的思想可以用下图来描述：
 
-![组件化]({{ site.url }}/MyBlog/_site/images/2015-02-05/a.png)
+![组件化]({{ site.url }}/my-demo/_site/images/2015-02-05/a.png)
 
 由于组件的使用者同时也可以是一个组件，所有上图也可以简为下图：
 
-![组件化]({{ site.url }}/MyBlog/_site/images/2015-02-05/b.png)
+![组件化]({{ site.url }}/my-demo/_site/images/2015-02-05/b.png)
 
 接下来该说说SOA了，还是先上图：
 
-![SOA]({{ site.url }}/MyBlog/_site/images/2015-02-05/c.png)
+![SOA]({{ site.url }}/my-demo/_site/images/2015-02-05/c.png)
 
 呃~~，确定不是简单的替换了下文字吗？是的，我确实只是简单的替换了下文字，当然，在实际应用中的ServiceFrame要比这个图的复杂的多，但基最本的功能无外乎服务发现与服务代理。从这个角度来看，SOA就是放大版的组件化编程，只不过SOA是从整体个架构层面来对系统进行抽象，它不关心每个服务内部如果实现，只要接口协议一致，就可以放到一起，统一接入，统一维护。
 
