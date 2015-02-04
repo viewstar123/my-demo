@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>从组件化到SOA</title>
+  <meta name="description" content="说到组件化编程，不能不提COM，作为WINDOWS的核心技术之一，不论是其功能的完备性，还是其复杂性，都是首屈一指的，不过本文不打算去讨论COM（其实是笔者对COM的了解也不算多啦），而是用更简单的例子来演示什么是组件化编程，以及其思想是如何影响架构设计的。">
+
+  <link rel="stylesheet" href="/blog/css/main.css">
+  <link rel="canonical" href="/blog/jekyll/update/2015/02/04/component-program-to-soa.html">
+  <link rel="alternate" type="application/rss+xml" title="Viewstar000`s Blog" href="/blog/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Viewstar000`s Blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/blog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">从组件化到SOA</h1>
+    <p class="post-meta">Feb 4, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <p>说到组件化编程，不能不提COM，作为WINDOWS的核心技术之一，不论是其功能的完备性，还是其复杂性，都是首屈一指的，不过本文不打算去讨论COM（其实是笔者对COM的了解也不算多啦），而是用更简单的例子来演示什么是组件化编程，以及其思想是如何影响架构设计的。</p>
+
+<p>为简单启见，本文中的代码全部使用PYTHON语法。首先来看一个简单的例子：</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Image</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Image class , can output to a file&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Image</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;jpeg&#39;</span><span class="p">:</span>
+            <span class="n">JpegCodec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;png&#39;</span><span class="p">:</span>
+            <span class="n">PngCodec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;raw&#39;</span><span class="p">:</span>
+            <span class="n">RawCodec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">BitmapCodec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code></pre></div>
+
+<p>相信很多人都遇到过这样的情况，显然，这不算是好的实现方式，如果要新增codec类型或者修改某个codec，不但要实现新的codec类，还要修改Image类的output方法。如代码中的有多个类似的output方法，那么代码的可维护性就可想而之了。</p>
+
+<p>接下来，可以很自然的想到用工厂模式对其进行重构：</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">CodecFactory</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;codec类工厂函数，跟据format，创建相应的实例并返回&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;jpeg&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JpegCodec</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;png&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PngCodec</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;raw&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">RawCodec</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">BitmapCodec</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Image</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Image class , can output to a file&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Image</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+        <span class="n">CodecFactory</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code></pre></div>
+
+<p>代码的变化似乎不大，不过，至少，output方法不在需要关心我要去使用哪个codec问题，但对于CodecFactory，仍然存在维护成本的问题。接下，见证奇迹的时刻到了：</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">__codec_table</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># codec注册表</span>
+
+<span class="k">def</span> <span class="nf">codec_register</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;注册一个codec类&quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">__codec_table</span>
+    <span class="n">__codec_table</span><span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">FORMAT</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span>
+    <span class="k">return</span> <span class="n">cls</span>
+
+
+<span class="k">def</span> <span class="nf">CodecFactory</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;codec类工厂函数，从注册表查询与format对应的类，创建相应的实例并返回&quot;&quot;&quot;</span>
+    
+    <span class="k">global</span> <span class="n">__codec_table</span>
+    <span class="n">codecClass</span> <span class="o">=</span> <span class="n">__codec_table</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">format</span><span class="p">,</span> <span class="n">BitmapCodec</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">codecClass</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+
+<span class="c"># Codec类的声明及注册</span>
+
+<span class="nd">@codec_register</span> 
+<span class="k">class</span> <span class="nc">JpegCodec</span><span class="p">(</span><span class="n">BaseCodec</span><span class="p">):</span>
+
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="s">&#39;jpeg&#39;</span>
+
+
+<span class="nd">@codec_register</span>
+<span class="k">class</span> <span class="nc">PngCodec</span><span class="p">(</span><span class="n">BaseCodec</span><span class="p">):</span>
+
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="s">&#39;png&#39;</span>
+
+
+<span class="nd">@codec_register</span>
+<span class="k">class</span> <span class="nc">RawCodec</span><span class="p">(</span><span class="n">BaseCodec</span><span class="p">):</span>
+
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="s">&#39;raw&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">Image</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Image class , can output to a file&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Image</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+        <span class="n">CodecFactory</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">format</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code></pre></div>
+
+<p>这里用到了一个PYTHON里的语法糖，在PYTHON中被称之为修饰器，代码段：</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="nd">@codec_register</span>
+<span class="k">class</span> <span class="nc">RawCodec</span><span class="p">(</span><span class="n">BaseCodec</span><span class="p">):</span>
+
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="s">&#39;raw&#39;</span></code></pre></div>
+
+<p>等效于：</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">RawCodec</span><span class="p">(</span><span class="n">BaseCodec</span><span class="p">):</span>
+
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="s">&#39;raw&#39;</span>
+
+<span class="n">codec_register</span><span class="p">(</span><span class="n">RawCodec</span><span class="p">)</span></code></pre></div>
+
+<p>至此，CodecFactory的维护成本也被降到了最低，且你可以很方便的去创建新的codec或替换已有codec，并且这些变化对codec以外的代码是完全无感知的。当然这一切都有一个隐含的前提条件：XxxCodec.output方法的接口格式保持不变或向下兼容。而这一点，也是组件化编程的重要的前提条件。</p>
+
+<p>上面代码已经具备了组件化编程框架的雏形，每个codec都是一个组件，codec_register就是组件注册器，CodecFactory就是组件实例生成器。只不过它是为codec专门设计的，可以再稍加改造，使其变得更加通用：</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">__component_table</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># 组件注册表</span>
+
+<span class="k">def</span> <span class="nf">component_register</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;注册一个Component类&quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">__component_table</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">Implement</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">ComponentName</span><span class="p">)</span>
+    <span class="n">__component_table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span>
+    <span class="k">return</span> <span class="n">cls</span>
+
+
+<span class="k">def</span> <span class="nf">ComponentFactory</span><span class="p">(</span><span class="n">iface</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Component工厂函数</span>
+<span class="sd">    从注册表查询与(iface, name)对应的类，</span>
+<span class="sd">    使用args与kwargs作为参数创建相应的实例并返回&quot;&quot;&quot;</span>
+    
+    <span class="k">global</span> <span class="n">__component_table</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">iface</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">key_default</span> <span class="o">=</span> <span class="p">(</span><span class="n">iface</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">__component_table</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">__component_table</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">key_default</span> <span class="ow">in</span> <span class="n">__component_table</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">__component_table</span><span class="p">[</span><span class="n">key_default</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+
+<span class="c"># Codec类的声明及注册</span>
+
+<span class="k">class</span> <span class="nc">ICodec</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Python本身没有接口的语法定义，</span>
+<span class="sd">    这里通过抛出NotImplementedError来模拟接口的特性&quot;&quot;&quot;</span>
+    
+    <span class="n">Implement</span> <span class="o">=</span> <span class="n">ICodec</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+
+<span class="nd">@codec_register</span> 
+<span class="k">class</span> <span class="nc">JpegCodec</span><span class="p">(</span><span class="n">ICodec</span><span class="p">):</span>
+
+    <span class="n">ComponentName</span> <span class="o">=</span> <span class="s">&#39;jpeg&#39;</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="nd">@codec_register</span>
+<span class="k">class</span> <span class="nc">PngCodec</span><span class="p">(</span><span class="n">ICodec</span><span class="p">):</span>
+
+    <span class="n">ComponentName</span> <span class="o">=</span> <span class="s">&#39;png&#39;</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="nd">@codec_register</span>
+<span class="k">class</span> <span class="nc">RawCodec</span><span class="p">(</span><span class="n">ICodec</span><span class="p">):</span>
+
+    <span class="n">ComponentName</span> <span class="o">=</span> <span class="s">&#39;raw&#39;</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<span class="nd">@codec_register</span>
+<span class="k">class</span> <span class="nc">BitmapCodec</span><span class="p">(</span><span class="n">ICodec</span><span class="p">):</span>
+
+    <span class="n">ComponentName</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># ICodec接口的默认实现</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">Image</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Image class , can output to a file&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Image</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+        <span class="c"># 调整调用的方式</span>
+        <span class="n">ComponentFactory</span><span class="p">(</span><span class="n">ICodec</span><span class="p">,</span> <span class="n">format</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code></pre></div>
+
+<p>到这里，一个最简单组件化框架就完成了，当然，作为框架而言，它还很不完善，如果你希望在生产环境下使用组件化编程，建议使用zope.component和zope.interface两扩展库。</p>
+
+<p>注：本文所列代码权做为示例，均没有经过实际调试。</p>
+
+<p>简单总结下，面向组件的编程的思想可以用下图来描述：</p>
+
+<p><img src="/blog/images/2015-02-05/a.png" alt="组件化" /></p>
+
+<p>由于组件的使用者同时也可以是一个组件，所有上图也可以简为下图：</p>
+
+<p><img src="/blog/images/2015-02-05/b.png" alt="组件化" /></p>
+
+<p>接下来该说说SOA了，还是先上图：</p>
+
+<p><img src="/blog/images/2015-02-05/c.png" alt="SOA" /></p>
+
+<p>呃~~，确定不是简单的替换了下文字吗？是的，我确实只是简单的替换了下文字，当然，在实际应用中的ServiceFrame要比这个图的复杂的多，但基最本的功能无外乎服务发现与服务代理。从这个角度来看，SOA就是放大版的组件化编程，只不过SOA是从整体个架构层面来对系统进行抽象，它不关心每个服务内部如果实现，只要接口协议一致，就可以放到一起，统一接入，统一维护。</p>
+
+<p>组件化编程所关注的更多的是模块内部的实现，组件的之间调用也就是通过本地的代码调用实现，虽然也有像DCOM这样的分布式组件技术，可以将组件分布不在同的机器上通过RPC进行分布式调用，但其要求所有组件必须是基于COM技术的，所以它仍然是一个同构的架构。</p>
+
+<p>而SOA所关注的是整体系统的业务抽像，服务之间的调用可以看做是消息的传递，因些，只要定义好消息的协议，SOA并不关心每个服务是如何实现的，只要按照标准，实现相应的协议就好，所以SOA是一个异构的架构。</p>
+
+<p>至于说如何实现一个SOA框架，本文不打算进行全面讨论了（其实是笔者之前也没做过啦，只是看别人做过啦），只是拿出其中的消息传递部分来简单讨论下，毕竟作为一个系统架构，消息传递的效率，直接影响整个系统的性能。</p>
+
+<p>消息传递的方式大体上可以分为以下几种：</p>
+
+<ul>
+  <li>点对点</li>
+  <li>点对面，也就是广播</li>
+  <li>发布/订阅</li>
+  <li>消息总线</li>
+</ul>
+
+<blockquote>
+  <p>点对点模式，也就是最基本的一对一的socket连接模式，消息从一个模块发送到到别一个模块，这是我们最常见的情况</p>
+</blockquote>
+
+<blockquote>
+  <p>点对面模式，也就是广播模式，消息从一个模块发出，所有与之相关的模块都会接收到消息，典型的应用场景，集群中的数据同步。</p>
+</blockquote>
+
+<blockquote>
+  <p>发布/订阅，可以看做是广播模式的改良。在广播模式中，发送方往往要维护静态的接收方的列表，如果接收方发生变化，则无法做到即时响应。在发布/订阅模下，发送方不需要维护静态的接收方列表，而由接收方动态发起订阅请求，并通过心跳维持活动状态，发送方可以动态的获取到当前处于活动状态的接收方，并可以有选择的进行消息的广播。典型的应用，移动应用中的消息推送。</p>
+</blockquote>
+
+<blockquote>
+  <p>消息总线，这个有点类似路由机制，发送方把消息丢给总线模块，由总线寻找合适的接收方，并所消息转发过去。由于大部分的消息总线都是用消息队列来实现，这也带来一个附加的好处，就是可以很方便做负载均衡和负载缓冲，犹其由于大量的提交请求，更容易保证提交的时序性。</p>
+</blockquote>
+
+
+  </article>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Viewstar000`s Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+          <li>Viewstar000`s Blog</li>
+          <li><a href="mailto:starv8132@gmail.com">starv8132@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/viewstar000">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                  <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+              <span class="username">viewstar000</span>
+            </a>
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col  footer-col-3">
+        <p class="text">Nothing more ...</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
